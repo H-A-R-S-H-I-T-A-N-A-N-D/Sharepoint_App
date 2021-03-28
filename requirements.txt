@@ -1,0 +1,8 @@
+Django==2.2.5
+pytz==2021.1
+sqlparse==0.4.1
+whitenoise==1.0.4
+gunicorn==19.1.1
+django-heroku
+psycopg2-binary
+dj-database-url

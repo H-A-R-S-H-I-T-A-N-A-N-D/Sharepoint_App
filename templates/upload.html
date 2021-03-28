@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Home Page{% endblock title %}
+
+{% block content %} 
+<!--    <h2>Sharepoint</h2>-->
+    {% if user.is_authenticated %}
+    <p>Your name is - {{user.first_name}} {{user.last_name}}</p>
+    <p>Your email is - {{user.email}}</p>
+    <a href="{% url 'profile' user.id %}">Edit Profile</a>
+<!--    <br><br>-->
+    <a href="{% url 'change_password' %}">Change Password</a>
+<!--    <br><br>-->
+    <a href="{% url 'logout' %}">Logout</a>
+    <br><br>
+<!--    <h2>Upload</h2>-->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="document">
+        <button type="submit">Upload File</button>
+    </form>
+    {% if url %}
+        <p>Uploaded file: <a href="{{ url }}">{{ url }}</a></p>
+    {% endif %}
+
+    {% if noFileChosen %}
+        <p>{{ noFileChosen }}</p>
+    {% endif %}
+<!--    {% block content_header %}-->
+<!--    <h2>Files</h2>-->
+<!--    <p>-->
+<!--      <a href="{% url 'upload' %}" class="btn btn-primary">Upload file</a>-->
+<!--    </p>-->
+<!--  {% endblock %}-->
+    <br><br>
+  <table class="table mb-0">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Created On</th>
+        <th>Modified On</th>
+          <th>View</th>
+        <th>Download</th>
+        <th>Delete</th>
+          <th>Share</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for file in files %}
+        <tr>
+          <td>{{ file.name }}</td>
+          <td>{{ file.date_created }}</td>
+          <td>{{ file.date_modified }}</td>
+          <td><a href="{{ file.file }}" class="btn btn-primary btn-sm" target="_blank">View</a></td>
+<!--            <td><a href="{{ file.file }}" class="btn btn-primary btn-sm" target="_blank">Download</a></td>-->
+          <td>
+            <form method="post" action="{% url 'download' file.document_id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-info btn-sm">Download</button>
+            </form>
+          </td>
+            <td>
+            <form method="post" action="{% url 'delete' file.document_id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </td>
+            <td><button class="btn btn-success btn-sm" data-toggle="modal" data-target="#MyModal">Share</button></td>
+            <div id="MyModal" class="modal" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">Share with
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <form method="post" action="{% url 'share' file.document_id %}">
+                                          {% csrf_token %}
+                                            <input type="email" name="sharewith">
+                                          <button type="submit" class="btn btn-danger btn-sm">Share</button>
+                                        </form>
+<!--                                        <button class = "btn btn-outline-info" type="button" class="btn bt-danger" data-toggle="modal" data-target="#Applied">Share</button>-->
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+    {% else %}
+    <a href="{% url 'login' %}">Login</a>
+    <br><br>
+    <a href="{% url 'password_reset' %}">Forgot Password</a>
+    <br><br>
+    <a href="{% url 'signup' %}">Sign Up</a>
+    {% endif %}
+{% endblock content %}
